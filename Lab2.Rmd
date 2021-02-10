@@ -5,3 +5,69 @@ date: "2/10/2021"
 output: html_document
 ---
 
+```{r, setup}
+library(nlme)
+
+data <- read.csv("test_autocor_copy-2.csv")
+
+## fit a weighted least squares model to the data 
+fit <- gls(y~as.factor(time),data)
+
+## obtain the estimated autocorrelation function 
+ACF(fit,form=~1 | id)
+```
+
+
+```{r, Q1}
+## import hypothetical study 1 
+    autocor1 <- read.csv("autocor1_copy-1.csv")
+    
+    ## fit a weighted least squares model to the data 
+    fit <- gls(y~as.factor(time),autocor1)
+    
+    ## obtain the estimated autocorrelation function 
+    ACF(fit,form=~1 | id)
+    
+## import hypothetical study 2 
+    autocor2 <- read.csv("autocor2_copy-1.csv")
+    
+    ## fit a weighted least squares model to the data 
+    fit <- gls(y~as.factor(time),autocor2)
+    
+    ## obtain the estimated autocorrelation function 
+    ACF(fit,form=~1 | id)
+    
+## import hypothetical study 3 
+    autocor3 <- read.csv("autocor3_copy-1.csv")
+    
+    ## fit a weighted least squares model to the data 
+    fit <- gls(y~as.factor(time),autocor3)
+    
+    ## obtain the estimated autocorrelation function 
+    ACF(fit,form=~1 | id)
+
+```
+
+```{r, Q2}
+## monthly imporvement in SF-36 using ordinary least squares 
+  # autocor 1 
+    fit.ols.1 <- lm(y~time, autocor1)
+  # autocor 2 
+    fit.ols.2 <- lm(y~time, autocor2)
+  # autocor 3
+    fit.ols.3 <- lm(y~time, autocor3)
+    
+fit.ols.2
+
+## montly improvement in SF-36 scores using weighted least squares 
+  # autocor 1 
+    gls(y~time, correlation=corSymm(form = ~ 1 | id), data = autocor1, method = "ML", weights = varIdent(form = ~1 |as.factor(time)))
+  # autocor 2 
+    gls(y~time, correlation=corSymm(form = ~ 1 | id), data = autocor2, method = "ML", weights = varIdent(form = ~1 |as.factor(time)))
+  # autocor 3
+        gls(y~time, correlation=corSymm(form = ~ 1 | id), data = autocor3, method = "ML", weights = varIdent(form = ~1 |as.factor(time)))
+
+    
+
+```
+
