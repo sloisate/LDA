@@ -1,0 +1,7 @@
+---
+title: "Lab 2 code"
+author: "Stacie Loisate"
+date: "2/10/2021"
+output: html_document
+---
+
