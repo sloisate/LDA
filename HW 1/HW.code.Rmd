@@ -1,0 +1,91 @@
+---
+title: "HW 1"
+author: "Stacie Loisate"
+date: "2/9/2021"
+output: html_document
+---
+
+```{r, dataimport}
+library(gmodels)
+dat <- read_csv("Downloads/camp_primary.csv")
+
+view(dat)
+```
+
+```{r, Part 1.1}
+
+## part a 
+  ## look at summary measures 
+  summary(dat$POSFEV)
+  table(dat$gender, exclude = NULL)
+  table(dat$ethnic, exclude = NULL)
+  
+  ## delete rows with missing posfev 
+  dat <- dat %>% 
+    drop_na(POSFEV)
+  summary(dat$POSFEV)
+  
+  ## create a "nobs" variable that counts the number of rows of data for each child 
+  nobs <- dat %>% 
+    count(id)
+
+## part b 
+  table(dat$trt)
+  attach(dat)
+ # summarize by treatment group 
+ # read$gender <- ifelse(read$female==1, "Female", "Male") -- use this code to add names to the output tables 
+  CrossTable(gender, trt, prop.t = FALSE, prop.chisq = FALSE) ##  if i don't include all the of the false stuff then i get more proportions 
+  CrossTable(age_rz, trt, prop.t = FALSE, prop.chisq = FALSE)
+  CrossTable(ethnic, trt, prop.t = FALSE, prop.chisq = FALSE)
+  
+  ## the number of children receiving the following trts: 
+    # 0 "placebo" - 2584
+    # 1 "budesonide" - 1995
+    # 2 "nedrocromil" - 1990
+
+```
+
+```{r, Part 1.2}
+
+## a - how does mean FEV1 change over the 48 months of primary CAMP study 
+  ggplot(dat, 
+         aes(x = visitc, y = POSFEV)) + 
+    geom_point() + 
+    theme_bw() 
+
+## b - plot between treatment groups 
+  par(mfrow=c(1,3))
+  dat$trt <- as.factor(trt)
+  trt_labels = c(`0` = "placebo", `1` = "budesonide", `2` = "nedrocromil")
+  
+    ggplot(dat, group = trt,
+         aes(x = visitc, y = POSFEV, color = trt)) + 
+    geom_point() + 
+    facet_grid(rows = vars(trt), labeller = as_labeller(trt_labels))
+
+## c -  plot between individual children ignoring treatment 
+  dat$id <- as.factor(id)
+  target_children <- c("1", "18", "9")
+  
+  id_children <- dat %>% 
+    filter(id %in% target_children)
+  
+  ggplot(id_children, group = id,
+    aes(x = visitc, y = POSFEV, color = id)) + 
+    geom_point()  
+  
+## d -  plot between individual children in each treatment group treatment 
+  ggplot(id_children, group = id,
+    aes(x = visitc, y = POSFEV, color = id)) + 
+    geom_point()+ 
+    facet_grid(rows = vars(trt), labeller = as_labeller(trt_labels))
+
+## e - propose a model 
+  # E(y) = b0 + b1(placebo) + b2(trt1) + b3(trt3) + b4(time)
+  # Ho: bx = 0; x = 2,3
+  # Ha: bx /= 0; x = 2,3
+  
+
+
+```
+
