@@ -7,7 +7,7 @@ output: html_document
 
 ```{r, dataimport}
 library(gmodels)
-dat <- read_csv("Downloads/camp_primary.csv")
+dat <- read_csv("camp_primary (1).csv")
 
 view(dat)
 ```
@@ -51,7 +51,7 @@ view(dat)
   ggplot(dat, 
          aes(x = visitc, y = POSFEV)) + 
     geom_point() + 
-    theme_bw() 
+    theme_classic() 
 
 ## b - plot between treatment groups 
   par(mfrow=c(1,3))
@@ -87,7 +87,41 @@ view(dat)
 
 ```
 
-```{r, Part 2}
+```{r, PartV}
+
+## short answer 
+library(nlme)
+fit = lme(POSFEV~visitc+as.factor(trt):visitc, data = dat, random=~1|id, na.action=na.omit, correlation=corExp(form=~visitc|id))
+
+## wald test for two interaction terms 
+
+L = cbind(c(0,0,1,0), c(0,0,0,1))
+beta = fit$coefficients$fixed
+V=fit$varFix
+test.stat = t(beta) %*% L %*% solve(t(L) %*% V %*% L) %*% t(L) %*% beta 
+
+1-pchisq(test.stat, df=2)
+
+fit 
+## get summary measures
+summary(fit)
+## get confidence intervals 
+intervals(fit)
+
+## look at residuals 
+residuals = resid(fit)
+residuals
+ggplot(data = dat, 
+       aes(x = visitc, y = residuals)) + 
+  geom_point()
+
+vcov(fit)
+
+qqnorm(residuals)
+
+test <- cor()
+round(test, 2)
+
 
 ```
 
